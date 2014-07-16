@@ -1,0 +1,3 @@
+#!/bin/bash
+./build.sh
+java -cp bin:lib/imgscalr-lib-4.2.jar:lib/jblas-1.2.3.jar raptor.PrepareTrainingInstance

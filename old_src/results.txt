@@ -1,0 +1,12 @@
+DISTANCE
+	50x50 25x25x25 converge after 115 epochs
+	40x40 25x25x25 dist (smooth) 100000 very nice converge
+
+
+
+	16x16 55x45x45 dist best convergence so far 96%
+
+
+
+
+

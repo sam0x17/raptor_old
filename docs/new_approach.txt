@@ -1,0 +1,132 @@
+A Metric for Covariance Matrices (Förstner, 1999)
+The bisection method in higher dimensions (Wood, 1992)
+
+two views
+interpolate 2x2 matrix -> pose parameters
+http://en.wikipedia.org/wiki/Multivariate_interpolation#Tensor_product_splines_for_N_dimensions
+
+1.  Place a 3-D model in a pose, form a point cloud from the model,
+     compute 3x3 covariance matrix from point cloud.
+2..Generate parallax by shifting the pose to two nearby poses along a baseline.
+3.  Generate the corresponding images and threshold.
+4. Generate a 3x3 covariance matrix using the  output of stereo vision.
+    (On Wikipedia, look up 'computer stereo vision' and 'epipolar geometry')
+5.  Measure the distance between your original model pose and this estimate.
+6.  Perform discriminative training (with a neural network obviously). 
+
+
+3D point cloud -> covariance matrix https://gist.github.com/atandrau/847214
+background: http://pages.cs.wisc.edu/~chaol/cs766/
+
+
+X =
+\begin{bmatrix}
+x_1 & x_2 & ... & x_n\\ 
+y_1 & y_2 & ... & y_n\\ 
+z_1 & z_2 & ... & z_n\\
+... & ... & ... & ...\\
+\end{bmatrix}
+\hspace{15 pt}
+\vec{x}_i = \begin{pmatrix}
+x_i\\ 
+y_i\\ 
+z_i \\
+...
+\end{pmatrix}
+\\
+\\
+\\
+\vec{m}=\frac{1}{m}\sum_{i=1}^{m}{\vec{x}_i}
+\\
+\Sigma=\frac{1}{m-1}\sum_{i=1}^{m}{(\vec{x}_i-\vec{m})(\vec{x}_i-\vec{m})^\mathrm{T}}
+
+
+
+3D cov 1
+
+\begin{bmatrix}
+\sigma(x,x) & \sigma(x,y) & \sigma(x,z)\\ 
+\sigma(y,x) & \sigma(y,y) & \sigma(y,z)\\
+\sigma(z,x) & \sigma(z,y) & \sigma(z,z)\\
+\end{bmatrix}
+
+
+3d cov 2
+
+\begin{bmatrix}
+\sigma(x,x) & \sigma(x,y) & \sigma(x,z)\\ 
+... & \sigma(y,y) & \sigma(y,z)\\
+... & ... & \sigma(z,z)\\
+\end{bmatrix}
+
+
+
+data matrix
+x =
+\begin{bmatrix}
+x_1 & x_2 & ... & x_n\\ 
+y_1 & y_2 & ... & y_n\\ 
+z_1 & z_2 & ... & z_n\\
+... & ... & ... & ...\\
+\end{bmatrix}
+
+
+
+distance formula
+
+d(\bold{A},\bold{B})=\sqrt{\sum_{i=1}^{n}{\ln^2 \lambda_i(\bold{A},\bold{B})}}
+
+
+
+orientations are normalized to [0, 1]
+
+func get_matrix_distance(M1, M2)
+	var E = joint eigenvalues of M1 and M2
+	var sum = 0
+	for i = 0 to size(E)
+		sum += ln^2(E_i)
+	end
+	return sqrt(sum)
+end
+	
+func get_covariance_matrix(imgdata[n][n])
+	return null
+end
+
+func get_random_pose()
+	return random pose
+end
+
+
+func get_pose(imgdata[n][n])
+	var M1 = get_covariance_matrix(imgdata)
+	var guess = (DIST: MAX_DIST / 2, X: 0.5, Y: 0.5, Z: 0.5)
+	var M2
+	var high_guess = (DIST: MAX-DIST, X: 1.0, Y: 1.0, Z: 1.0)
+	# find distance
+	do
+		M2 = get_covariance_matrix(guess)
+		var dist = get_matrix_distance(M1, M2)
+		if(dist < threshold) then
+			return guess
+		end if
+		if(
+	loop
+end
+
+
+// evaluates h(x) once per call after first iteration: O(log2(n))
+func bisection_search(func h, low, high, low_dist=null, high_dist=null)
+	if(low ~= high) then
+		return low
+	end if
+	var mid = low + (high - low) / 2.0
+	if(low_dist == null) low_dist = h(low)
+	if(high_dist == null) high_dist = h(high)
+	var mid_dist = h(mid)
+	if(low_dist < mid_dist) then
+		return bisection_search(h, low, mid, low_dist, mid_dist)
+	else
+		return bisection_search(h, mid, high, mid_dist, high_dist)
+	end if
+end

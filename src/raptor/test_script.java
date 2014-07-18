@@ -13,8 +13,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import raptor.engine.Image.PixelGrid;
-
 import org.jblas.*;
  
 /**

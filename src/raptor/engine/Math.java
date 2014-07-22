@@ -14,6 +14,23 @@ import static raptor.engine.Image.*;
 public final class Math
 {
 	
+	public static String matrix2String(DoubleMatrix matrix)
+	{
+		double M[][] = matrix.toArray2();
+		String st = "";
+		for(int r = 0; r < M.length; r++)
+		{
+			st += "[";
+			for(int c = 0; c < M[0].length; c++)
+			{
+				st += M[r][c] + "\n";
+				if(c + 1 < M[0].length) st += ",\t";
+			}
+			st += "]\n";
+		}
+		return st;
+	}
+	
 	public static void printMatrix(DoubleMatrix matrix)
 	{
 		printMatrix(matrix, null);

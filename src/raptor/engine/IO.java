@@ -14,4 +14,16 @@ public final class IO
 		if(n.contains(".")) return Double.parseDouble(n);
 		else return Integer.parseInt(n);
 	}
+	
+	public static String indentString(String st, int num_indents, String indent_char)
+	{
+		String ret = "";
+		for(String line : st.split("\n"))
+		{
+			for(int i = 0; i < num_indents; i++)
+				ret += indent_char;
+			ret += line;
+		}
+		return ret;
+	}
 }

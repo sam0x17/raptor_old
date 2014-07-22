@@ -12,4 +12,10 @@ import raptor.GenTrainingBase;
 public class GenTrainingC extends GenTrainingBase
 {
 
+	@Override
+	public void postProcessing() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

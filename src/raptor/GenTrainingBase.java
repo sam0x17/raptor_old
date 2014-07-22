@@ -31,7 +31,7 @@ public abstract class GenTrainingBase
 	public double true_dist;
 	public DoubleMatrix cov3d = null;
 	public PrintWriter writer = null;
-	public boolean verbose = false;
+	public boolean verbose = true;
 	
 	public boolean cov3d_on = true;
 	
@@ -168,7 +168,9 @@ public abstract class GenTrainingBase
 	{
 		cov2d_on = true;
 		PixelGrid orig_img_grid = normalizeImage(orig_img);
-		cov2d = imageAs2DPointCloud(orig_img_grid, threshold);
+		DoubleMatrix image_data = imageAs2DPointCloud(orig_img_grid, threshold);
+		cov2d = getCovarianceMatrix(image_data);
+		
 	}
 	
 	public abstract void postProcessing();
@@ -188,24 +190,28 @@ public abstract class GenTrainingBase
 		{
 			double cov3d_tmp[][] = cov3d.toArray2();
 			for(int r = 0; r < cov3d_tmp.length; r++)
+			{
 				for(int c = 0; c < cov3d_tmp[0].length; c++)
 				{
 					writer.print(cov3d_tmp[r][c]);
 					if(c + 1 < cov3d_tmp[0].length) writer.print("\t");
 				}
-			writer.println();
+				writer.println();
+			}
 		}
 		
 		if(cov2d_on)
 		{
 			double cov2d_tmp[][] = cov2d.toArray2();
 			for(int r = 0; r < cov2d_tmp.length; r++)
+			{
 				for(int c = 0; c < cov2d_tmp[0].length; c++)
 				{
 					writer.print(cov2d_tmp[r][c]);
 					if(c + 1 < cov2d_tmp[0].length) writer.print("\t");
 				}
-			writer.println();
+				writer.println();
+			}
 		}
 	}
 	

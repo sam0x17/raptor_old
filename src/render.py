@@ -111,6 +111,9 @@ print("Free Rotation Variables: " + free_rot_vars)
 start = int(os.getenv('start'))
 end = int(os.getenv('end')) + 1
 
+# get plan letter
+plan = str(os.getenv('plan'))
+
 # set up scene and render variables
 scene = bpy.context.scene
 render = scene.render
@@ -311,7 +314,8 @@ for i in range(start, end):
 	ry = v[1]
 	rz = v[2]'''
 	print("processing image and generating annotations...")
-	subprocess.call(['java', '-cp', '.:bin', '-Xmx6024M', '-Xms6024M', 'prepare', img_filename, annotation_filename,
+#java -cp bin:lib/imgscalr-lib-4.2.jar:lib/jblas-1.2.3.jar raptor.planB.GenTrainingB
+	subprocess.call(['java', '-cp', '.:lib:bin:../lib/imgscalr-lib-4.2.jar:../lib/jblas-1.2.3.jar', '-Xmx5024M', '-Xms5024M', 'raptor.plan' + plan + '.GenTraining' + plan, img_filename, annotation_filename,
 						str(dest_width), str(dest_height),
 						str(true_dist),
 						str(rx), str(ry), str(rz),

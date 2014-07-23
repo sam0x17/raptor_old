@@ -127,7 +127,7 @@ public abstract class GenTrainingBase
 			println_verbose("      true_dist: " + true_dist);
 			println_verbose("     dest_width: " + dest_width);
 			println_verbose("    dest_height: " + dest_height);
-			println_verbose("          cov3d: " + indentString(matrix2String(cov3d), 17, " "));
+			println_verbose("          cov3d: " + indentString(matrix2String(cov3d), 17, " ").substring(17));
 			println_verbose("======================================================================================");
 			println_verbose();
 			

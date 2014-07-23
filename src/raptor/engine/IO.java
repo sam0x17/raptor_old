@@ -22,7 +22,7 @@ public final class IO
 		{
 			for(int i = 0; i < num_indents; i++)
 				ret += indent_char;
-			ret += line;
+			ret += line + "\n";
 		}
 		return ret;
 	}

@@ -23,7 +23,7 @@ public final class Math
 			st += "[";
 			for(int c = 0; c < M[0].length; c++)
 			{
-				st += M[r][c] + "\n";
+				st += M[r][c];
 				if(c + 1 < M[0].length) st += ",\t";
 			}
 			st += "]\n";

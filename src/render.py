@@ -313,7 +313,9 @@ for i in range(start, end):
 	rx = v[0]
 	ry = v[1]
 	rz = v[2]'''
+	print("\n")
 	print("processing image and generating annotations...")
+	print("\n")
 #java -cp bin:lib/imgscalr-lib-4.2.jar:lib/jblas-1.2.3.jar raptor.planB.GenTrainingB
 	subprocess.call(['java', '-cp', '.:lib:bin:../lib/imgscalr-lib-4.2.jar:../lib/jblas-1.2.3.jar', '-Xmx5024M', '-Xms5024M', 'raptor.plan' + plan + '.GenTraining' + plan, img_filename, annotation_filename,
 						str(dest_width), str(dest_height),

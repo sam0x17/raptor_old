@@ -302,7 +302,7 @@ for i in range(start, end):
 	dest_height = 128
 	true_dist = render_pose(pose['rot'], pose['dist_factor'], pose['light_energy'], width, height, img_filename)
 	cov = get_3d_covariance_matrix(get_pointcloud())
-	print(cov)
+	#print(cov)
 	rx = pose['rot'][0]
 	ry = pose['rot'][1]
 	rz = pose['rot'][2]

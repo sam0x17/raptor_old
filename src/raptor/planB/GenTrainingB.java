@@ -17,7 +17,7 @@ public class GenTrainingB extends GenTrainingBase
 		genImageCovarianceMatrix(0.01);
 		autoCrop();
 		autoResize();
-		
+		writeOriginalImage();
 	}
 
 }

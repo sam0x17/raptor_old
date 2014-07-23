@@ -13,6 +13,7 @@ import org.jblas.*;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 
 import javax.imageio.ImageIO;
@@ -152,6 +153,7 @@ public abstract class GenTrainingBase
 		crop_factor[2] = (double)(orig_img.getWidth() - (crop_bounds.x + crop_bounds.width)) / (double)orig_img.getWidth();
 		crop_factor[3] = (double)(orig_img.getHeight() - (crop_bounds.y + crop_bounds.height)) / (double)orig_img.getHeight();
 		orig_img = cropImage(orig_img, crop_bounds);
+		println_verbose("    crop_factor: " + crop_factor[0] + ", " + crop_factor[1] + ", " + crop_factor[2] + ", " + crop_factor[3]);
 	}
 	
 	public void autoResize()
@@ -161,6 +163,7 @@ public abstract class GenTrainingBase
 		resize_factor_x = resize_bounds.width / (double)orig_img.getWidth();
 		resize_factor_y = resize_bounds.height / (double)orig_img.getHeight();
 		orig_img = resize(orig_img, resize_bounds);
+		println_verbose("  resize_factor: " + resize_factor_x + ", " + resize_factor_y);
 	}
 	
 	public void genImageCovarianceMatrix(double threshold)
@@ -170,6 +173,15 @@ public abstract class GenTrainingBase
 		DoubleMatrix image_data = imageAs2DPointCloud(orig_img_grid, threshold);
 		cov2d = getCovarianceMatrix(image_data);
 		print_verbose("          cov2d: " + indentString(matrix2String(cov2d), 17, " ").substring(17));
+	}
+	
+	public final void writeOriginalImage()
+	{
+		try {
+			ImageIO.write(orig_img, "png", new File(orig_img_path));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public abstract void postProcessing();

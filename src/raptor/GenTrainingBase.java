@@ -72,6 +72,8 @@ public abstract class GenTrainingBase
 	{
 		if(!processArgs(args)) return;
 		postProcessing();
+		println_verbose("======================================================================================");
+		println_verbose();
 		saveAnnotations();
 		if(writer != null) writer.close();
 	}
@@ -127,9 +129,8 @@ public abstract class GenTrainingBase
 			println_verbose("      true_dist: " + true_dist);
 			println_verbose("     dest_width: " + dest_width);
 			println_verbose("    dest_height: " + dest_height);
-			println_verbose("          cov3d: " + indentString(matrix2String(cov3d), 17, " ").substring(17));
-			println_verbose("======================================================================================");
 			println_verbose();
+			println_verbose("          cov3d: " + indentString(matrix2String(cov3d), 17, " ").substring(17));
 			
 		} catch (Exception e) {
 			System.out.println("usage: java annotate_image /path/to/input/image /path/to/output dest_width dest_height true_distance rx ry rz cov00 cov01 cov02 cov03 cov04 cov05 cov06 cov07 cov08");
@@ -145,8 +146,6 @@ public abstract class GenTrainingBase
 	{
 		auto_crop_on = true;
 		println_verbose();
-		println_verbose("auto_crop: [ON]");
-		println_verbose("original dimensions: " + orig_img.getWidth() + "\t" + orig_img.getHeight());
 		crop_bounds = getSmartCropBounds(orig_img, orig_img.getRGB(0, 0));
 		crop_factor[0] = (double)crop_bounds.x / (double)orig_img.getWidth();
 		crop_factor[1] = (double)crop_bounds.y / (double)orig_img.getHeight();
@@ -170,7 +169,7 @@ public abstract class GenTrainingBase
 		PixelGrid orig_img_grid = normalizeImage(orig_img);
 		DoubleMatrix image_data = imageAs2DPointCloud(orig_img_grid, threshold);
 		cov2d = getCovarianceMatrix(image_data);
-		
+		print_verbose("          cov2d: " + indentString(matrix2String(cov2d), 17, " ").substring(17));
 	}
 	
 	public abstract void postProcessing();

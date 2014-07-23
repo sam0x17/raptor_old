@@ -184,6 +184,15 @@ public abstract class GenTrainingBase
 		}
 	}
 	
+	public final void writeAlternateImage(String suffix)
+	{
+		try {
+			ImageIO.write(orig_img, "png", new File(orig_img_path + suffix));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public abstract void postProcessing();
 	
 	public void saveAnnotations()

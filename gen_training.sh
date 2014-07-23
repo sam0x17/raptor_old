@@ -2,7 +2,7 @@
 ./build.sh
 cd bin
 CORES=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || sysctl -n hw.ncpu)
-start=1
+start=0
 end=10000
 per=$((($end - $start) / $CORES))
 echo $per

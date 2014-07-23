@@ -1,8 +1,9 @@
 #!/bin/bash
 mkdir bin -p
 mkdir bin/data -p
-rm bin -r -f || exit 1
-mkdir bin || exit 1
+mv bin/data .
+rm bin/* -r -f
+mv data bin
 jars=".:bin"
 for f in lib/*.jar
 do

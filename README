@@ -1,2 +1,4 @@
-README
-asdf
+RAPTOR - Rapid Three-dimensional Orientation Resolver
+
+RAPTOR is a novel 3D pipeline for inferring the 3D distance and orientation 
+(pose) of known classes of rigid objects from 2D image data.

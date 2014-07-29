@@ -3,7 +3,7 @@
 cd bin
 CORES=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || sysctl -n hw.ncpu)
 start=0
-end=1000
+end=30
 per=$((($end - $start) / $CORES))
 echo $per
 for (( i=0; i<CORES; i++ ))

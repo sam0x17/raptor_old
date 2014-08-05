@@ -98,4 +98,47 @@ public final class Math
 		result.divi(data.columns - 1);
 		return result;
 	}
+	
+	public static class BasicStat
+	{
+		private int numSamples = 0;
+		private double sum = 0.0;
+		private double min = Double.MAX_VALUE;
+		private double max = Double.MIN_VALUE;
+		
+		public void addSample(double sample)
+		{
+			sum += sample;
+			numSamples++;
+			if(sample < min)
+				min = sample;
+			else if(sample > max)
+				max = sample;
+		}
+		
+		public double getAverage()
+		{
+			return sum / (double)numSamples;
+		}
+		
+		public double getSum()
+		{
+			return sum;
+		}
+		
+		public double getMin()
+		{
+			return min;
+		}
+		
+		public double getMax()
+		{
+			return max;
+		}
+	}
+	
+	public abstract static class BasicObserverStat<T> extends BasicStat
+	{
+		public abstract void update(T parent);
+	}
 }

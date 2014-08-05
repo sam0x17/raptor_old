@@ -229,7 +229,7 @@ for obj in bpy.context.selected_objects:
 
 # fit model to viewport
 compute_bb()
-scale_factor = 8.0 / max_dim
+scale_factor = 7.5 / max_dim
 view3d.pivot_point = "CURSOR"
 view3d.cursor_location = center_world
 for obj in bpy.context.selected_objects:
@@ -296,8 +296,8 @@ for i in range(start, end):
 	model_name = str.replace(ntpath.basename(raptor_3dsfile.lower()), '.3ds', '')
 	img_filename = "data/" + model_name + "_%06d.png" % i
 	annotation_filename = "data/" + model_name + "_%06d.txt" % i
-	width = 1280
-	height = 720
+	width = 1000
+	height = 1000
 	dest_width = 128
 	dest_height = 128
 	true_dist = render_pose(pose['rot'], pose['dist_factor'], pose['light_energy'], width, height, img_filename)

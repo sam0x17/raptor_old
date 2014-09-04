@@ -15,4 +15,3 @@ done
 istart=$(($per * $i))
 iend=$end
 raptor_3dsfile="/home/sam/Desktop/raptor/old_src/ships/hamina-class missile boat/Hamina.3DS" free_rot_vars=xyz plan=B start=$istart end=$iend blender -b -P render.py &
-

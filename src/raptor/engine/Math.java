@@ -135,6 +135,15 @@ public final class Math
 		{
 			return max;
 		}
+		
+		public void prettyPrint(String name)
+		{
+			System.out.println(name + " avg: " + getAverage());
+			System.out.println(name + " min: " + getMin());
+			System.out.println(name + " max: " + getMax());
+			System.out.println(name + " sum: " + getSum());
+			System.out.println();
+		}
 	}
 	
 	public abstract static class BasicObserverStat<T> extends BasicStat

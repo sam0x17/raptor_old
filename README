@@ -2,3 +2,56 @@ RAPTOR - Rapid Three-dimensional Orientation Resolver
 
 RAPTOR is a novel 3D pipeline for inferring the 3D distance and orientation 
 (pose) of known classes of rigid objects from 2D image data.
+
+
+currently only runs on linux
+
+prerequisites -- first run this in a terminal:
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install default-jre python blender
+
+
+current features:
+at the moment the evaluation code is being rewritten so right now it is
+only possible to generate training data. The old version of RAPTOR
+(available in old_src) does contain an old version of planA. The
+preliminary results referenced in the technical report were generated
+using this old version, however once the new infrastructure is finished,
+I will re-run these tests because in the first version there were some
+flaws that likely contributed to the level of error I observed.
+
+Since the training data has to accomodate all 3 pipeline variants, there
+are many components to each training instance, and no single pipeline 
+variant uses all of these components. 
+
+Currently each training instance consists of the following information:
+distance from camera (output)
+rotation_x, rotation_y, rotation_z (output)
+3D covariance matrix from 3D model (output / reference)
+raw pixels for rendered image (input)
+resized and automatically cropped 128x128 version of rendered image (input)
+scaling factors (from resizing) (input)
+crop factors (proportion by which each edge was cropped) (input)
+2D covariance matrix from rendered image (input)
+
+
+To generate training data:
+./gen_training.sh 1 1000
+
+note: once output stops, you will need to use CTRL+C to quit the script
+manually.
+
+this will generate 1000 training instances in the bin/data folder (first
+argument specifies the number of the first instance to be created, second
+argument specifies the number of the last instance to be created)
+
+a training data compilation script is also underway that will combine all
+of the generated training data into a single file that RAPTOR will seek
+through as needed. At the moment this script merely parses through the
+existing training data and outputs some useful statistics.
+
+to run the training data compilation script (after generating training data):
+./test_compile_training.sh
+
+this should load all the data in your bin/data directory and print statistics

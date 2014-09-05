@@ -42,6 +42,9 @@ To generate training data:
 note: once output stops, you will need to use CTRL+C to quit the script
 manually.
 
+note: it is unnecessary to run ./build.sh since this is automatically called
+by all the other scripts.
+
 this will generate 1000 training instances in the bin/data folder (first
 argument specifies the number of the first instance to be created, second
 argument specifies the number of the last instance to be created)

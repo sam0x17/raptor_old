@@ -4,6 +4,7 @@ mkdir bin/data -p
 mv bin/data .
 rm bin/* -r -f
 mv data bin
+cp src/ships bin -r
 jars=".:bin"
 for f in lib/*.jar
 do

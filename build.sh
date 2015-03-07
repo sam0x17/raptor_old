@@ -5,6 +5,7 @@ mv bin/data .
 rm bin/* -r -f
 mv data bin
 cp src/ships bin -r
+mkdir bin/linear_experiment
 jars=".:bin"
 for f in lib/*.jar
 do

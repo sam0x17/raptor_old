@@ -2,7 +2,6 @@ package raptor;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Arrays;
@@ -280,7 +279,7 @@ public class CompileTrainingData
 			alt_img_width = alt_img.getWidth();
 			current_instance.alt_img = normalizeImage(alt_img);
 		}
-		
+		sc.close();
 	}
 	
 	public final void updateStats()

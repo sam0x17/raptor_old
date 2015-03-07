@@ -284,4 +284,45 @@ public final class Image
 			}
 		return -1;
 	}
+	
+	/**
+	 * Converts an RGB color value to HSL. Conversion formula
+	 * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+	 * Assumes r, g, and b are contained in the set [0, 255] and
+	 * returns h, s, and l in the set [0, 1].
+	 *
+	 * @param   Number  r       The red color value
+	 * @param   Number  g       The green color value
+	 * @param   Number  b       The blue color value
+	 * @return  Array           The HSL representation
+	 */
+	private static int[] rgbToHsl(int r, int g, int b){
+		r /= 255;
+		g /= 255;
+		b /= 255;
+		int max = java.lang.Math.max(java.lang.Math.max(r, g), b);
+		int min = java.lang.Math.min(java.lang.Math.min(r, g), b);
+		int h = 0;
+		int s = 0;
+	    int l = (max + min) / 2;
+	    if(max == min) {
+	        h = s = 0; // achromatic
+	    }else{
+	    	int d = max - min;
+	        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+	        if(max == r) {
+	        	h = (g - b) / d + (g < b ? 6 : 0);
+	        } else if(max == g) {
+	        	h = (b - r) / d + 2;
+	        } else if (max == b) {
+	        	h = (r - g) / d + 4;
+	        }
+	        h /= 6;
+	    }
+	    int [] ret = new int[3];
+	    ret[0] = h;
+	    ret[1] = s;
+	    ret[2] = l;
+	    return ret;
+	}
 }

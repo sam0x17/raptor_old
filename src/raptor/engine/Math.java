@@ -13,6 +13,27 @@ import static raptor.engine.Image.*;
  */
 public final class Math
 {
+/*
+func get_matrix_distance(M1, M2)
+	var E = joint eigenvalues of M1 and M2
+	var sum = 0
+	for i = 0 to size(E)
+		sum += ln^2(E_i)
+	end
+	return sqrt(sum)
+end
+ */
+	public static double matrix_difference_metric(DoubleMatrix A, DoubleMatrix B)
+	{
+		DoubleMatrix E = Eigen.symmetricGeneralizedEigenvalues(A, B);
+		double sum = 0.0;
+		for(double Ei : E.data)
+		{
+			double ln = java.lang.Math.log(Ei);
+			sum += ln * ln;
+		}
+		return java.lang.Math.sqrt(sum);
+	}
 	
 	public static String matrix2String(DoubleMatrix matrix)
 	{

@@ -130,8 +130,11 @@ public abstract class GenTrainingBase
 			println_verbose("      true_dist: " + true_dist);
 			println_verbose("     dest_width: " + dest_width);
 			println_verbose("    dest_height: " + dest_height);
-			println_verbose();
-			println_verbose("          cov3d: " + indentString(matrix2String(cov3d), 17, " ").substring(17));
+			if(cov3d_on)
+			{
+				println_verbose();
+				println_verbose("          cov3d: " + indentString(matrix2String(cov3d), 17, " ").substring(17));
+			}
 			
 		} catch (Exception e) {
 			System.out.println("usage: java annotate_image /path/to/input/image /path/to/output dest_width dest_height true_distance rx ry rz cov00 cov01 cov02 cov03 cov04 cov05 cov06 cov07 cov08");

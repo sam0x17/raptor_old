@@ -94,6 +94,22 @@ end
 		return new DoubleMatrix(vals);
 	}
 	
+	public static DoubleMatrix imageAs3DPointCloud(PixelGrid grid)
+	{
+		double vals[][] = new double[3][grid.pixels.length * grid.pixels[0].length];
+		for(int y = 0, k = 0; y < grid.pixels.length; y++)
+		{
+			for(int x = 0; x < grid.pixels[0].length; x++)
+			{
+				vals[0][k] = x;
+				vals[1][k] = y;
+				vals[2][k] = grid.pixels[y][x] * grid.pixels.length;
+			    k++;
+			}
+		}
+		return new DoubleMatrix(vals);
+	}
+	
 	public static DoubleMatrix getColMean(DoubleMatrix data)
 	{
 		DoubleMatrix mean = new DoubleMatrix(data.rows, 1);

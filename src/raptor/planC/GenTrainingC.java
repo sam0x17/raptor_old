@@ -16,7 +16,6 @@ public class GenTrainingC extends GenTrainingBase
 	{
 		GenTrainingC generator = new GenTrainingC();
 		generator.cov3d_on = false;
-		Thread.sleep(100);
 		generator.run(args);
 	}
 

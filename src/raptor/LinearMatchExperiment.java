@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -22,6 +23,10 @@ import static raptor.engine.Math.*;
 public class LinearMatchExperiment
 {
 	public boolean cov2d_on = true;
+	public boolean cov3d_on = true;
+	public boolean autocrop_on = true;
+	public boolean autoresize_on = true;
+	public boolean alt_img_on = true;
 	public static Random rand = new Random(System.currentTimeMillis());
 	
 	public String data_dir = null;
@@ -40,7 +45,7 @@ public class LinearMatchExperiment
 		if(!folder.isDirectory())
 			throw new IllegalArgumentException("path must be a directory!");
 
-		System.out.println("Loading data from: '" + data_dir + "'...");
+		System.out.println("Getting filenames from: '" + data_dir + "'...");
 		File[] files = folder.listFiles(new FilenameFilter()
 		{
 			public boolean accept(File dir, String name)
@@ -50,37 +55,120 @@ public class LinearMatchExperiment
 				else return false;
 			}
 		});
-		System.out.println("Sorting...");
+		System.out.println("Sorting filenames...");
 		Arrays.sort(files,new Comparator<File>() { public int compare(File a, File b) { return a.getName().compareTo(b.getName()); } });
 		
-		// select one instance to linearly match
-		int selected_index = rand.nextInt(files.length);
-		File selected_file = files[selected_index];
-		
-		System.out.println("File #" + selected_index + " selected (" + selected_file.getName() + ")");
-		Instance selected_instance = loadInstance(selected_file);
-		
-		System.out.println("Processing " + files.length + " instances...");
-		ArrayList<DistanceMatch> distance_matches = new ArrayList<DistanceMatch>();
+		System.out.println("Loading data...");
+		ArrayList<DistanceMatch> instances = new ArrayList<DistanceMatch>();
 		for(int i = 0; i < files.length; i++)
 		{
 			File annotation_file = files[i];
-			System.out.println("Processing " + annotation_file.getName() + "...");
 			Instance instance = loadInstance(annotation_file);
 			DistanceMatch match = new DistanceMatch();
 			match.annotation_file = annotation_file;
 			match.instance = instance;
-			match.dist = matrix_difference_metric(instance.cov2d, selected_instance.cov2d);
-			distance_matches.add(match);
+			match.dist = 0.0;
+			instances.add(match);
 		}
-		System.out.println("Sorting distances...");
-		Collections.sort(distance_matches);
-		Collections.reverse(distance_matches);
-		for(DistanceMatch match : distance_matches)
+		
+		HashSet<Integer> already_chosen = new HashSet<Integer>();
+		int num_iterations = 100;
+		int top_hits_to_consider = 5;
+		
+		double avg_dist_offset = 0.0;
+		double avg_rx_offset = 0.0;
+		double avg_ry_offset = 0.0;
+		double avg_rz_offset = 0.0;
+		
+		System.out.println("Running iterations...");
+		
+		int times_best_match_found = 0;
+		
+		for(int iteration = 0; iteration < num_iterations; iteration++)
 		{
-			System.out.println(match.annotation_file + "\t" + match.dist + "\t" + match.instance.rx + "\t" + match.instance.ry + "\t" + match.instance.rz + "\t" + match.instance.true_dist);
+			// select one instance to linearly match
+			int selected_index = rand.nextInt(files.length);
+			while(already_chosen.contains(selected_index))
+			{
+				selected_index = rand.nextInt(files.length);
+			}
+			File selected_file = files[selected_index];
+			System.out.println("File #" + selected_index + " selected\t(" + selected_file.getName() + ")");
+			Instance selected_instance = loadInstance(selected_file);
+			
+			ArrayList<DistanceMatch> distance_matches = new ArrayList<DistanceMatch>();
+			for(int i = 0; i < instances.size(); i++)
+			{
+				DistanceMatch ref = instances.get(i);
+				DistanceMatch match = new DistanceMatch();
+				match.annotation_file = ref.annotation_file;
+				match.instance = ref.instance;
+				match.dist = matrix_difference_metric(match.instance.cov2d, selected_instance.cov2d);
+				distance_matches.add(match);
+			}
+			
+			Collections.sort(distance_matches);
+			Collections.reverse(distance_matches);
+			
+			double offset_best = Double.MAX_VALUE;
+			Instance best_match = null;
+			int best_match_index = -1;
+			
+			for(int i = 0; i < distance_matches.size() - 1; i++)
+			{
+				Instance hit = distance_matches.get(i).instance;
+				double offset = Math.abs(selected_instance.true_dist - hit.true_dist) / 3.0 +
+						        Math.abs(selected_instance.rx - hit.rx) +
+						        Math.abs(selected_instance.ry - hit.ry) +
+						        Math.abs(selected_instance.rz - hit.rz);
+				if(offset < offset_best)
+				{
+					offset_best = offset;
+					best_match = hit;
+					best_match_index = i;
+				}
+			}
+			
+			double dist_offset_best = Math.abs(selected_instance.true_dist - best_match.true_dist);
+			double rx_offset_best = Math.abs(selected_instance.rx - best_match.rx);
+			double ry_offset_best = Math.abs(selected_instance.ry - best_match.ry);
+			double rz_offset_best = Math.abs(selected_instance.rz - best_match.rz);
+			
+			avg_dist_offset += dist_offset_best;
+			avg_rx_offset += rx_offset_best;
+			avg_ry_offset += ry_offset_best;
+			avg_rz_offset += rz_offset_best;
+			
+			System.out.println(best_match_index);
+			for(int i = 0; i < top_hits_to_consider; i++)
+			{
+				if(distance_matches.size() - 1 - i == best_match_index)
+				{
+					System.out.println("yeah");
+					times_best_match_found++;
+					break;
+				}
+			}
 		}
+		
+		avg_dist_offset /= (double)num_iterations;
+		avg_rx_offset /= (double)num_iterations;
+		avg_ry_offset /= (double)num_iterations;
+		avg_rz_offset /= (double)num_iterations;
+		
+		double percent_best_match_found = (double)(times_best_match_found) / (double)(num_iterations) * 100.0;
+		
 		System.out.println();
+		
+		System.out.println("   avg_rx_offset: " + avg_rx_offset + " (" + (avg_rx_offset / Math.PI * 2.0) + "%)");
+		System.out.println("   avg_ry_offset: " + avg_ry_offset + " (" + (avg_ry_offset / Math.PI * 2.0) + "%)");
+		System.out.println("   avg_rz_offset: " + avg_rz_offset + " (" + (avg_rz_offset / Math.PI * 2.0) + "%)");
+		System.out.println(" avg_dist_offset: " + avg_dist_offset + " (" + (avg_dist_offset / 70.0) + "%)");
+		
+		System.out.println();
+		
+		System.out.println("best match found: " + percent_best_match_found + "%");
+		
 	}
 	
 	public static class DistanceMatch implements Comparable<DistanceMatch>
@@ -102,25 +190,53 @@ public class LinearMatchExperiment
 		
 		Instance instance = new Instance();
 		
-		line = sc.nextLine();
-		System.out.println(line);
+		line = sc.nextLine();;
 		instance.true_dist = Double.parseDouble(line);
 		line = sc.nextLine();
-		System.out.println(line);
 		tokens = line.split("\t");
 		instance.rx = Double.parseDouble(tokens[0]);
 		instance.ry = Double.parseDouble(tokens[1]);
 		instance.rz = Double.parseDouble(tokens[2]);
-		double cov2d_tmp[][] = new double[2][2];
-		for(int r = 0; r < cov2d_tmp.length; r++)
+		if(autocrop_on)
 		{
 			line = sc.nextLine();
-			System.out.println(line);
 			tokens = line.split("\t");
-			for(int c = 0; c < tokens.length; c++)
-				cov2d_tmp[r][c] = Double.parseDouble(tokens[c]);
+			instance.crop_f0 = Double.parseDouble(tokens[0]);
+			instance.crop_f1 = Double.parseDouble(tokens[1]);
+			instance.crop_f2 = Double.parseDouble(tokens[2]);
+			instance.crop_f3 = Double.parseDouble(tokens[3]);
 		}
-		instance.cov2d = new DoubleMatrix(cov2d_tmp);
+		if(autoresize_on)
+		{
+			line = sc.nextLine();
+			tokens = line.split("\t");
+			instance.auto_resize_fx = Double.parseDouble(tokens[0]);
+			instance.auto_resize_fy = Double.parseDouble(tokens[1]);
+		}
+		if(cov3d_on)
+		{
+			double cov3d_tmp[][] = new double[3][3];
+			for(int r = 0; r < cov3d_tmp.length; r++)
+			{
+				line = sc.nextLine();
+				tokens = line.split("\t");
+				for(int c = 0; c < tokens.length; c++)
+					cov3d_tmp[r][c] = Double.parseDouble(tokens[c]);
+			}
+			instance.cov3d = new DoubleMatrix(cov3d_tmp);
+		}
+		if(cov2d_on)
+		{
+			double cov2d_tmp[][] = new double[2][2];
+			for(int r = 0; r < cov2d_tmp.length; r++)
+			{
+				line = sc.nextLine();
+				tokens = line.split("\t");
+				for(int c = 0; c < tokens.length; c++)
+					cov2d_tmp[r][c] = Double.parseDouble(tokens[c]);
+			}
+			instance.cov2d = new DoubleMatrix(cov2d_tmp);
+		}
 		
 		sc.close();
 		return instance;

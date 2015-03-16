@@ -6,7 +6,7 @@ start=$1
 end=$2
 per=$((($end - $start) / $CORES))
 echo $per
-for (( i=0; i<CORES; i++ ))
+for (( i=0; i<$CORES; i++ ))
 do
 	istart=$(($per * $i))
 	iend=$(($istart + $per - 1))

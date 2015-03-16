@@ -292,7 +292,7 @@ def gen_random_pose(min_dist_factor, max_dist_factor, min_lighting, max_lighting
 	return {'rot': rot, 'dist_factor': dist_factor, 'light_energy': light_energy}
 
 for i in range(start, end):
-	pose = gen_random_pose(0.0, 8.0, 0.0, 0.65)
+	pose = gen_random_pose(0.0, 4.0, 0.35, 0.45)
 	model_name = str.replace(ntpath.basename(raptor_3dsfile.lower()), '.3ds', '')
 	img_filename = "data/" + model_name + "_%06d.png" % i
 	annotation_filename = "data/" + model_name + "_%06d.txt" % i

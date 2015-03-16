@@ -14,10 +14,13 @@ public class GenTrainingB extends GenTrainingBase
 	@Override
 	public void postProcessing()
 	{
+		//genImageCovarianceMatrix(0.01);
+		//autoCrop();
+		//autoResize();
+		//writeAlternateImage("_crop");
+		
 		genImageCovarianceMatrix(0.01);
-		autoCrop();
-		autoResize();
-		writeAlternateImage("_crop");
+		genImageSpecialCovarianceMatrix();
 	}
 
 }

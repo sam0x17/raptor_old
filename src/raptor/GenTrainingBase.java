@@ -34,7 +34,9 @@ public abstract class GenTrainingBase
 	public PrintWriter writer = null;
 	public boolean verbose = true;
 	
-	public boolean cov3d_on = true;
+	public boolean cov3d_on = false;
+	public boolean cov2d_special_on = false;
+	DoubleMatrix cov2d_special = null;
 	
 	public Rectangle crop_bounds = null;
 	public double crop_factor[] = new double[]{0.0, 0.0, 0.0, 0.0};
@@ -172,10 +174,19 @@ public abstract class GenTrainingBase
 	public void genImageCovarianceMatrix(double threshold)
 	{
 		cov2d_on = true;
-		PixelGrid orig_img_grid = normalizeImage(orig_img);
+		if(orig_img_grid == null) orig_img_grid = normalizeImage(orig_img);
 		DoubleMatrix image_data = imageAs2DPointCloud(orig_img_grid, threshold);
 		cov2d = getCovarianceMatrix(image_data);
 		print_verbose("          cov2d: " + indentString(matrix2String(cov2d), 17, " ").substring(17));
+	}
+	
+	public void genImageSpecialCovarianceMatrix()
+	{
+		cov2d_special_on = true;
+		if(orig_img_grid == null) orig_img_grid = normalizeImage(orig_img);
+		DoubleMatrix image_data = imageAs3DPointCloud(orig_img_grid);
+		cov2d_special = getCovarianceMatrix(image_data);
+		print_verbose("  cov2d_special: " + indentString(matrix2String(cov2d_special), 17, " ").substring(17));
 	}
 	
 	public final void writeOriginalImage()
@@ -232,6 +243,20 @@ public abstract class GenTrainingBase
 				{
 					writer.print(cov2d_tmp[r][c]);
 					if(c + 1 < cov2d_tmp[0].length) writer.print("\t");
+				}
+				writer.println();
+			}
+		}
+		
+		if(cov2d_special_on)
+		{
+			double cov2d_special_tmp[][] = cov2d_special.toArray2();
+			for(int r = 0; r < cov2d_special_tmp.length; r++)
+			{
+				for(int c = 0; c < cov2d_special_tmp[0].length; c++)
+				{
+					writer.print(cov2d_special_tmp[r][c]);
+					if(c + 1 < cov2d_special_tmp[0].length) writer.print("\t");
 				}
 				writer.println();
 			}

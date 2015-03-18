@@ -13,6 +13,8 @@ import org.jblas.*;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -24,6 +26,7 @@ import javax.imageio.ImageIO;
  */
 public abstract class GenTrainingBase
 {
+	PrintWriter error_writer = null;
 	public BufferedImage orig_img = null;
 	public String orig_img_path = null;
 	public String annotation_path = null;
@@ -69,6 +72,23 @@ public abstract class GenTrainingBase
 	public int getNumValidArgs()
 	{
 		return 17;
+	}
+	
+	public void logError(String msg) {
+		if(error_writer == null)
+		{
+			try {
+				error_writer = new PrintWriter(new FileWriter("ERRORS.log", true)); 
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		error_writer.println(msg);
+		error_writer.flush();
 	}
 	
 	public final void run(String[] args)

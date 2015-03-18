@@ -317,7 +317,7 @@ for i in range(start, end):
 	print("processing image and generating annotations...")
 	print("\n")
 #java -cp bin:lib/imgscalr-lib-4.2.jar:lib/jblas-1.2.3.jar raptor.planB.GenTrainingB
-	subprocess.call(['java', '-cp', '.:lib:bin:../lib/imgscalr-lib-4.2.jar:../lib/jblas-1.2.3.jar', '-Xmx60M', '-Xms60M', 'raptor.plan' + plan + '.GenTraining' + plan, img_filename, annotation_filename,
+	subprocess.call(['java', '-cp', '.:lib:bin:../lib/imgscalr-lib-4.2.jar:../lib/jblas-1.2.3.jar', '-Xmx100M', '-Xms100M', 'raptor.plan' + plan + '.GenTraining' + plan, img_filename, annotation_filename,
 						str(dest_width), str(dest_height),
 						str(true_dist),
 						str(rx), str(ry), str(rz),

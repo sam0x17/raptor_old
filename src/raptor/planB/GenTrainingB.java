@@ -1,14 +1,21 @@
 package raptor.planB;
 
+import java.io.FileNotFoundException;
+
 import raptor.GenTrainingBase;
 
 public class GenTrainingB extends GenTrainingBase
 {
 	
-	public static void main(String[] args)
+	public static void main(String[] args) throws FileNotFoundException
 	{
 		GenTrainingB generator = new GenTrainingB();
-		generator.run(args);
+		try {
+			generator.run(args);
+		} catch (Throwable e) {
+			generator.logError(e.getMessage());
+		}
+		
 	}
 
 	@Override
@@ -18,9 +25,9 @@ public class GenTrainingB extends GenTrainingBase
 		//autoCrop();
 		//autoResize();
 		//writeAlternateImage("_crop");
-		
 		genImageCovarianceMatrix(0.01);
 		genImageSpecialCovarianceMatrix();
+
 	}
 
 }

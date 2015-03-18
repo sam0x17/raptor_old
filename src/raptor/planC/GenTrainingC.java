@@ -3,6 +3,8 @@
  */
 package raptor.planC;
 
+import java.io.FileNotFoundException;
+
 import raptor.GenTrainingBase;
 
 /**
@@ -12,7 +14,7 @@ import raptor.GenTrainingBase;
 public class GenTrainingC extends GenTrainingBase
 {
 
-	public static void main(String[] args) throws InterruptedException
+	public static void main(String[] args) throws InterruptedException, FileNotFoundException
 	{
 		GenTrainingC generator = new GenTrainingC();
 		generator.cov3d_on = false;

@@ -3,6 +3,8 @@
  */
 package raptor.planA;
 
+import java.io.FileNotFoundException;
+
 import raptor.GenTrainingBase;
 import raptor.planB.GenTrainingB;
 
@@ -13,7 +15,7 @@ import raptor.planB.GenTrainingB;
 public class GenTrainingA extends GenTrainingBase
 {
 
-	public static void main(String[] args)
+	public static void main(String[] args) throws FileNotFoundException
 	{
 		GenTrainingB generator = new GenTrainingB();
 		generator.run(args);

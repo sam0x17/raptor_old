@@ -44,6 +44,7 @@ public class CombineData {
 		}
 		System.out.println("Found " + original_samples.size() + " unique samples.");
 		HashSet<String> taken_prefixes = new HashSet<String>();
+		int num = 0;
 		for(Sample sample : original_samples) {
 			String new_prefix = null;
 			while(new_prefix == null || taken_prefixes.contains(new_prefix))
@@ -59,6 +60,8 @@ public class CombineData {
 			File dest_annotation = new File(dest_folder.getAbsolutePath() + "/" + new_prefix + ".txt");
 			Files.copy(original_image_file.toPath(), dest_image.toPath());
 			Files.copy(original_annotation_file.toPath(), dest_annotation.toPath());
+			num++;
+			System.out.println("Added sample #" + num + " (" + new_prefix + ")");
 		}
 	}
 	

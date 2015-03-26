@@ -23,10 +23,11 @@ import static raptor.engine.Math.*;
 public class LinearMatchExperiment
 {
 	public boolean cov2d_on = true;
-	public boolean cov3d_on = true;
-	public boolean autocrop_on = true;
-	public boolean autoresize_on = true;
-	public boolean alt_img_on = true;
+	public boolean cov3d_on = false;
+	public boolean cov2d_special_on = true;
+	public boolean autocrop_on = false;
+	public boolean autoresize_on = false;
+	public boolean alt_img_on = false;
 	public static Random rand = new Random(System.currentTimeMillis());
 	
 	public String data_dir = null;
@@ -55,6 +56,7 @@ public class LinearMatchExperiment
 				else return false;
 			}
 		});
+		System.out.println("Found " + files.length + " samples");
 		System.out.println("Sorting filenames...");
 		Arrays.sort(files,new Comparator<File>() { public int compare(File a, File b) { return a.getName().compareTo(b.getName()); } });
 		
@@ -63,22 +65,34 @@ public class LinearMatchExperiment
 		for(int i = 0; i < files.length; i++)
 		{
 			File annotation_file = files[i];
-			Instance instance = loadInstance(annotation_file);
+			Instance instance;
+			try {
+				instance = loadInstance(annotation_file);
+			} catch (Exception e) {
+				System.out.println("Corrupted -- skipping " + annotation_file.getName());
+				continue;
+			}
 			DistanceMatch match = new DistanceMatch();
 			match.annotation_file = annotation_file;
 			match.instance = instance;
 			match.dist = 0.0;
 			instances.add(match);
 		}
+
+		System.out.println("Found " + instances.size() + " uncorrupted samples");
 		
 		HashSet<Integer> already_chosen = new HashSet<Integer>();
 		int num_iterations = 100;
-		int top_hits_to_consider = 5;
+		int top_hits_to_consider = 500;
 		
 		double avg_dist_offset = 0.0;
 		double avg_rx_offset = 0.0;
 		double avg_ry_offset = 0.0;
 		double avg_rz_offset = 0.0;
+		double avg_dist_pct_error = 0.0;
+		double avg_rx_pct_error = 0.0;
+		double avg_ry_pct_error = 0.0;
+		double avg_rz_pct_error = 0.0;
 		
 		System.out.println("Running iterations...");
 		
@@ -117,10 +131,10 @@ public class LinearMatchExperiment
 			for(int i = 0; i < distance_matches.size() - 1; i++)
 			{
 				Instance hit = distance_matches.get(i).instance;
-				double offset = Math.abs(selected_instance.true_dist - hit.true_dist) / 3.0 +
-						        Math.abs(selected_instance.rx - hit.rx) +
-						        Math.abs(selected_instance.ry - hit.ry) +
-						        Math.abs(selected_instance.rz - hit.rz);
+				double offset = Math.abs(selected_instance.true_dist - hit.true_dist) / selected_instance.true_dist +
+						        Math.abs(selected_instance.rx - hit.rx) / selected_instance.rx +
+						        Math.abs(selected_instance.ry - hit.ry) / selected_instance.ry +
+						        Math.abs(selected_instance.rz - hit.rz) / selected_instance.rz;
 				if(offset < offset_best)
 				{
 					offset_best = offset;
@@ -133,11 +147,21 @@ public class LinearMatchExperiment
 			double rx_offset_best = Math.abs(selected_instance.rx - best_match.rx);
 			double ry_offset_best = Math.abs(selected_instance.ry - best_match.ry);
 			double rz_offset_best = Math.abs(selected_instance.rz - best_match.rz);
+
+			double dist_pct_error = dist_offset_best / best_match.true_dist;
+			double rx_pct_error = rx_offset_best / best_match.rx;
+			double ry_pct_error = ry_offset_best / best_match.ry;
+			double rz_pct_error = rz_offset_best / best_match.rz;
 			
 			avg_dist_offset += dist_offset_best;
 			avg_rx_offset += rx_offset_best;
 			avg_ry_offset += ry_offset_best;
 			avg_rz_offset += rz_offset_best;
+
+			avg_dist_pct_error += dist_pct_error;
+			avg_rx_pct_error += rx_pct_error;
+			avg_ry_pct_error += ry_pct_error;
+			avg_rz_pct_error += rz_pct_error;
 			
 			System.out.println(best_match_index);
 			for(int i = 0; i < top_hits_to_consider; i++)
@@ -155,15 +179,20 @@ public class LinearMatchExperiment
 		avg_rx_offset /= (double)num_iterations;
 		avg_ry_offset /= (double)num_iterations;
 		avg_rz_offset /= (double)num_iterations;
+
+		avg_dist_pct_error /= (double)num_iterations;
+		avg_rx_pct_error /= (double)num_iterations;
+		avg_ry_pct_error /= (double)num_iterations;
+		avg_rz_pct_error /= (double)num_iterations;
 		
 		double percent_best_match_found = (double)(times_best_match_found) / (double)(num_iterations) * 100.0;
 		
 		System.out.println();
 		
-		System.out.println("   avg_rx_offset: " + avg_rx_offset + " (" + (avg_rx_offset / Math.PI * 2.0) + "%)");
-		System.out.println("   avg_ry_offset: " + avg_ry_offset + " (" + (avg_ry_offset / Math.PI * 2.0) + "%)");
-		System.out.println("   avg_rz_offset: " + avg_rz_offset + " (" + (avg_rz_offset / Math.PI * 2.0) + "%)");
-		System.out.println(" avg_dist_offset: " + avg_dist_offset + " (" + (avg_dist_offset / 70.0) + "%)");
+		System.out.println("   best match avg_rx_offset: " + avg_rx_offset + " (" + (avg_rx_pct_error * 100.0) + "%)");
+		System.out.println("   best match avg_ry_offset: " + avg_ry_offset + " (" + (avg_ry_pct_error * 100.0) + "%)");
+		System.out.println("   best match avg_rz_offset: " + avg_rz_offset + " (" + (avg_rz_pct_error * 100.0) + "%)");
+		System.out.println(" best match avg_dist_offset: " + avg_dist_offset + " (" + (avg_dist_pct_error * 100.0) + "%)");
 		
 		System.out.println();
 		
@@ -213,6 +242,18 @@ public class LinearMatchExperiment
 			instance.auto_resize_fx = Double.parseDouble(tokens[0]);
 			instance.auto_resize_fy = Double.parseDouble(tokens[1]);
 		}
+                if(cov2d_on)
+                {
+                        double cov2d_tmp[][] = new double[2][2];
+                        for(int r = 0; r < cov2d_tmp.length; r++)
+                        {
+                                line = sc.nextLine();
+                                tokens = line.split("\t");
+                                for(int c = 0; c < tokens.length; c++)
+                                        cov2d_tmp[r][c] = Double.parseDouble(tokens[c]);
+                        }
+                        instance.cov2d = new DoubleMatrix(cov2d_tmp);
+                }
 		if(cov3d_on)
 		{
 			double cov3d_tmp[][] = new double[3][3];
@@ -225,19 +266,18 @@ public class LinearMatchExperiment
 			}
 			instance.cov3d = new DoubleMatrix(cov3d_tmp);
 		}
-		if(cov2d_on)
+		if(cov2d_special_on)
 		{
-			double cov2d_tmp[][] = new double[2][2];
-			for(int r = 0; r < cov2d_tmp.length; r++)
+			double cov2ds_tmp[][] = new double[3][3];
+			for(int r = 0; r < cov2ds_tmp.length; r++)
 			{
 				line = sc.nextLine();
 				tokens = line.split("\t");
 				for(int c = 0; c < tokens.length; c++)
-					cov2d_tmp[r][c] = Double.parseDouble(tokens[c]);
+					cov2ds_tmp[r][c] = Double.parseDouble(tokens[c]);
 			}
-			instance.cov2d = new DoubleMatrix(cov2d_tmp);
+			instance.cov2d_special = new DoubleMatrix(cov2ds_tmp);
 		}
-		
 		sc.close();
 		return instance;
 	}

@@ -13,6 +13,7 @@ public class Instance
 
 	public DoubleMatrix cov2d = null;
 	public DoubleMatrix cov3d = null;
+	public DoubleMatrix cov2d_special = null;
 	
 	PixelGrid main_img = null;
 	PixelGrid alt_img = null;

@@ -52,10 +52,14 @@ public class CombineData {
 			taken_prefixes.add(new_prefix);
 			File original_image_file = new File(sample.parent_directory + "/" + sample.prefix + ".png");
 			File original_annotation_file = new File(sample.parent_directory + "/" + sample.prefix + ".txt");
-			if(!original_image_file.exists())
-				throw new RuntimeException("MISSING IMAGE FILE: " + original_image_file.getPath());
-			if(!original_annotation_file.exists())
-				throw new RuntimeException("MISSING ANNOTATION FILE: " + original_annotation_file.getPath());
+			if(!original_image_file.exists()) {
+				System.out.println("SKIPPING DUE TO MISSING IMAGE FILE");
+				continue;
+			}
+			if(!original_annotation_file.exists()) {
+				System.out.println("SKIPPING DUE TO MISSING ANNOTATION FILE");
+				continue;
+			}
 			File dest_image = new File(dest_folder.getAbsolutePath() + "/" + new_prefix + ".png");
 			File dest_annotation = new File(dest_folder.getAbsolutePath() + "/" + new_prefix + ".txt");
 			Files.copy(original_image_file.toPath(), dest_image.toPath());

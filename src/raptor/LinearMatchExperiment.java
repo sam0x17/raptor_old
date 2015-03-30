@@ -82,8 +82,8 @@ public class LinearMatchExperiment
 		System.out.println("Found " + instances.size() + " uncorrupted samples");
 		
 		HashSet<Integer> already_chosen = new HashSet<Integer>();
-		int num_iterations = 100;
-		int top_hits_to_consider = 500;
+		int num_iterations = 500;
+		int top_hits_to_consider = 2;
 		
 		double avg_dist_offset = 0.0;
 		double avg_rx_offset = 0.0;
@@ -93,6 +93,20 @@ public class LinearMatchExperiment
 		double avg_rx_pct_error = 0.0;
 		double avg_ry_pct_error = 0.0;
 		double avg_rz_pct_error = 0.0;
+
+		double overall_avg_rx_pct_error = 0.0;
+		double overall_avg_ry_pct_error = 0.0;
+		double overall_avg_rz_pct_error = 0.0;
+		double overall_avg_dist_pct_error = 0.0;
+		double overall_avg_rx_hit_offset = 0.0;
+		double overall_avg_ry_hit_offset = 0.0;
+		double overall_avg_rz_hit_offset = 0.0;
+		double overall_avg_dist_hit_offset = 0.0;
+		int overall_times_rx_within_threshold = 0;
+		int overall_times_ry_within_threshold = 0;
+		int overall_times_rz_within_threshold = 0;
+		int overall_times_dist_within_threshold = 0;
+		double rotation_threshold = 10.0;
 		
 		System.out.println("Running iterations...");
 		
@@ -163,17 +177,84 @@ public class LinearMatchExperiment
 			avg_ry_pct_error += ry_pct_error;
 			avg_rz_pct_error += rz_pct_error;
 			
-			System.out.println(best_match_index);
+			double avg_rx_hit_offset = 0.0;
+			double avg_ry_hit_offset = 0.0;
+			double avg_rz_hit_offset = 0.0;
+			double avg_dist_hit_offset = 0.0;
+			double avg_rx_hit_pct_error = 0.0;
+			double avg_ry_hit_pct_error = 0.0;
+			double avg_rz_hit_pct_error = 0.0;
+			double avg_dist_hit_pct_error = 0.0;
 			for(int i = 0; i < top_hits_to_consider; i++)
 			{
-				if(distance_matches.size() - 1 - i == best_match_index)
+				Instance hit = distance_matches.get(distance_matches.size() - 2 - i).instance;
+				double rx_offset = Math.abs(hit.rx - selected_instance.rx);
+				double ry_offset = Math.abs(hit.ry - selected_instance.ry);
+				double rz_offset = Math.abs(hit.rz - selected_instance.rz);
+				double dist_offset = Math.abs(hit.true_dist - selected_instance.true_dist);
+				avg_rx_hit_offset += rx_offset;
+				avg_ry_hit_offset += ry_offset;
+				avg_rz_hit_offset += rz_offset;
+				avg_dist_hit_offset += dist_offset;
+				avg_rx_hit_pct_error += rx_offset / selected_instance.rx;
+				avg_ry_hit_pct_error += ry_offset / selected_instance.ry;
+				avg_rz_hit_pct_error += rz_offset / selected_instance.rz;
+				avg_dist_hit_pct_error += dist_offset / selected_instance.true_dist;
+				if(distance_matches.size() - 2 - i == best_match_index)
 				{
 					System.out.println("yeah");
 					times_best_match_found++;
 					break;
 				}
 			}
+			avg_rx_hit_offset /= (double)top_hits_to_consider;
+			avg_ry_hit_offset /= (double)top_hits_to_consider;
+			avg_rz_hit_offset /= (double)top_hits_to_consider;
+			avg_dist_hit_offset /= (double)top_hits_to_consider;
+			overall_avg_rx_hit_offset += avg_rx_hit_offset;
+			overall_avg_ry_hit_offset += avg_ry_hit_offset;
+			overall_avg_rz_hit_offset += avg_rz_hit_offset;
+			avg_rx_hit_pct_error /= (double)top_hits_to_consider;
+			avg_ry_hit_pct_error /= (double)top_hits_to_consider;
+			avg_rz_hit_pct_error /= (double)top_hits_to_consider;
+			avg_dist_hit_pct_error /= (double)top_hits_to_consider;
+			//System.out.println("   average top hit offset rx: " + avg_rx_hit_offset);
+			//System.out.println("   average top hit offset ry: " + avg_ry_hit_offset);
+			//System.out.println("   average top hit offset rz: " + avg_rz_hit_offset);
+			//System.out.println(" average top hit offset dist: " + avg_dist_hit_offset);
+			System.out.println("    average top hit error rx: " + (avg_rx_hit_pct_error * 100.0) + "%");
+			System.out.println("    average top hit error ry: " + (avg_ry_hit_pct_error * 100.0) + "%");
+			System.out.println("    average top hit error rz: " + (avg_rz_hit_pct_error * 100.0) + "%");
+			System.out.println("  average top hit error dist: " + (avg_dist_hit_pct_error * 100.0) + "%");
+			overall_avg_rx_pct_error += avg_rx_hit_pct_error;
+			overall_avg_ry_pct_error += avg_ry_hit_pct_error;
+			overall_avg_rz_pct_error += avg_rz_hit_pct_error;
+			overall_avg_dist_pct_error += avg_dist_pct_error;
+			System.out.println("   off by rx: " + (avg_rx_hit_offset * 57.2957795) + "°");
+			System.out.println("   off by ry: " + (avg_ry_hit_offset * 57.2957795) + "°");
+			System.out.println("   off by rz: " + (avg_rz_hit_offset * 57.2957795) + "°");
+			if(avg_rx_hit_offset * 57.2957795 <= rotation_threshold) {
+				overall_times_rx_within_threshold++;
+				System.out.println("           rx within threshold");
+			}
+			if(avg_ry_hit_offset * 57.2957795 <= rotation_threshold) {
+				overall_times_ry_within_threshold++;
+				System.out.println("           ry within threshold");
+			}
+			if(avg_rz_hit_offset * 57.2957795 <= rotation_threshold) {
+				overall_times_rz_within_threshold++;
+				System.out.println("           rz within threshold");
+			}
 		}
+
+		overall_avg_rx_pct_error /= (double)num_iterations;
+		overall_avg_ry_pct_error /= (double)num_iterations;
+		overall_avg_rz_pct_error /= (double)num_iterations;
+		overall_avg_dist_pct_error /= (double)num_iterations;
+		overall_avg_rx_hit_offset /= (double)num_iterations;
+                overall_avg_ry_hit_offset /= (double)num_iterations;
+                overall_avg_rz_hit_offset /= (double)num_iterations;
+                overall_avg_dist_hit_offset /= (double)num_iterations;
 		
 		avg_dist_offset /= (double)num_iterations;
 		avg_rx_offset /= (double)num_iterations;
@@ -197,7 +278,22 @@ public class LinearMatchExperiment
 		System.out.println();
 		
 		System.out.println("best match found: " + percent_best_match_found + "%");
-		
+		System.out.println();
+		System.out.println("   overall error rx: " + (overall_avg_rx_pct_error * 100.0) + "%");
+                System.out.println("   overall error ry: " + (overall_avg_ry_pct_error * 100.0) + "%");
+                System.out.println("   overall error rz: " + (overall_avg_rz_pct_error * 100.0) + "%");
+                System.out.println(" overall error dist: " + (overall_avg_dist_pct_error * 100.0) + "%");
+
+		System.out.println();
+
+		System.out.println("   overall % within threshold rx: " + ((double)overall_times_rx_within_threshold / (double)num_iterations * 100.0) + "%");
+		System.out.println("   overall % within threshold ry: " + ((double)overall_times_ry_within_threshold / (double)num_iterations * 100.0) + "%");
+		System.out.println("   overall % within threshold rz: " + ((double)overall_times_rz_within_threshold / (double)num_iterations * 100.0) + "%");
+		System.out.println(" overall % within threshold dist: " + ((double)overall_times_dist_within_threshold / (double)num_iterations * 100.0) + "%");
+
+                System.out.println("   avg off by rx: " + (overall_avg_rx_hit_offset * 57.2957795) + "°");
+                System.out.println("   avg off by ry: " + (overall_avg_ry_hit_offset * 57.2957795) + "°");
+                System.out.println("   avg off by rz: " + (overall_avg_rz_hit_offset * 57.2957795) + "°");
 	}
 	
 	public static class DistanceMatch implements Comparable<DistanceMatch>

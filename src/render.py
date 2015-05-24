@@ -292,16 +292,16 @@ def gen_random_pose(min_dist_factor, max_dist_factor, min_lighting, max_lighting
 	return {'rot': rot, 'dist_factor': dist_factor, 'light_energy': light_energy}
 
 for i in range(start, end):
-	pose = gen_random_pose(0.0, 4.0, 0.35, 0.45)
+	pose = gen_random_pose(0.0, 4.0, 0.4, 0.4)
 	model_name = str.replace(ntpath.basename(raptor_3dsfile.lower()), '.3ds', '')
 	img_filename = "data/" + model_name + "_%06d.png" % i
 	annotation_filename = "data/" + model_name + "_%06d.txt" % i
-	width = 1000
-	height = 1000
+	width = 900
+	height = 900
 	dest_width = 128
 	dest_height = 128
 	true_dist = render_pose(pose['rot'], pose['dist_factor'], pose['light_energy'], width, height, img_filename)
-	cov = get_3d_covariance_matrix(get_pointcloud())
+	#cov = get_3d_covariance_matrix(get_pointcloud())
 	#print(cov)
 	rx = pose['rot'][0]
 	ry = pose['rot'][1]
@@ -320,8 +320,5 @@ for i in range(start, end):
 	subprocess.call(['java', '-cp', '.:lib:bin:../lib/imgscalr-lib-4.2.jar:../lib/jblas-1.2.3.jar', '-Xmx100M', '-Xms100M', 'raptor.plan' + plan + '.GenTraining' + plan, img_filename, annotation_filename,
 						str(dest_width), str(dest_height),
 						str(true_dist),
-						str(rx), str(ry), str(rz),
-						str(cov[0][0]), str(cov[0][1]), str(cov[0][2]),
-						str(cov[1][0]), str(cov[1][1]), str(cov[1][2]),
-						str(cov[2][0]), str(cov[2][1]), str(cov[2][2])])
+						str(rx), str(ry), str(rz)])
 
